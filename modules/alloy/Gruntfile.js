@@ -1,5 +1,4 @@
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const path = require('path');
 
 const create = (inFile, outFile) => {
@@ -18,12 +17,7 @@ const create = (inFile, outFile) => {
     resolve: {
       symlinks: false,
       extensions: ['.ts', '.js'],
-      plugins: [
-        new TsConfigPathsPlugin({
-          configFile: tsConfig,
-          extensions: ['.ts', '.js']
-        }),
-      ]
+      tsconfig: tsConfig
     },
     ignoreWarnings: [
       // suppress type re-export warnings caused by `transpileOnly: true`
@@ -44,10 +38,12 @@ const create = (inFile, outFile) => {
             loader: 'ts-loader',
             options: {
               transpileOnly: true,
-              projectReferences: true,
+              projectReferences: false,
+              onlyCompileBundledFiles: true,
               configFile: tsConfig,
               compilerOptions: {
-                declarationMap: false
+                declarationMap: false,
+                outDir: undefined
               }
             }
           }]

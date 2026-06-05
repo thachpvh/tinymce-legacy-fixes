@@ -312,7 +312,7 @@ const shouldAutoHideStyleFormats = option('style_formats_autohide');
 const getContentLanguages = option('content_langs');
 const getRemovedMenuItems = option('removed_menuitems');
 const getToolbarMode = option('toolbar_mode');
-const getToolbarGroups = option('toolbar_groups');
+const getToolbarGroups: (editor: Editor) => EditorOptions['toolbar_groups'] = option('toolbar_groups');
 const getToolbarLocation = option('toolbar_location');
 const fixedContainerSelector = option('fixed_toolbar_container');
 const fixedToolbarContainerTarget = option('fixed_toolbar_container_target');

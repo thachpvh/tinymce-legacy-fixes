@@ -1,11 +1,10 @@
-const TsConfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const path = require('path');
 const fs = require('fs');
 const webpack = require('webpack');
 
 const packageData = require('../../package.json');
 
-let create = (entries, tsConfig, outDir = '.') => {
+let create = (entries, tsConfig, outDir = '.', compilerOptions = {}) => {
   const tsConfigPath = path.resolve(tsConfig);
   const resolvedEntries = Object.entries(entries).reduce((acc, entry) => {
     acc[entry[0]] = path.resolve('./' + entry[1]);
@@ -31,12 +30,7 @@ let create = (entries, tsConfig, outDir = '.') => {
     ],
     resolve: {
       extensions: [ '.ts', '.js' ],
-      plugins: [
-        new TsConfigPathsPlugin({
-          configFile: tsConfigPath,
-          extensions: [ '.ts', '.js' ]
-        })
-      ]
+      tsconfig: tsConfigPath
     },
     module: {
       rules: [
@@ -86,6 +80,7 @@ let create = (entries, tsConfig, outDir = '.') => {
               loader: 'ts-loader',
               options: {
                 configFile: tsConfigPath,
+                compilerOptions,
                 transpileOnly: true,
                 projectReferences: true
               }
@@ -136,6 +131,8 @@ const buildEntries = (typeNames, type, entry, pathPrefix = '') => typeNames.redu
 
 const all = (plugins, themes, models) => {
   return [
+    // TS6 reports TS5011 when ts-loader's transpileOnly path clears rootDir
+    // while outDir is set. Webpack controls output paths here, so clear outDir.
     create({
       'scratch/demos/core/demo.js': 'src/core/demo/ts/demo/Demos.ts',
       'scratch/demos/core/cspdemo.js': 'src/core/demo/ts/demo/ContentSecurityPolicyDemo.ts',
@@ -145,7 +142,7 @@ const all = (plugins, themes, models) => {
       ...buildEntries(models, 'models', 'Main.ts', 'js/tinymce/'),
       ...buildDemoEntries(themes, 'themes', 'Demos.ts', 'scratch/demos/'),
       ...buildEntries(themes, 'themes', 'Main.ts', 'js/tinymce/'),
-    }, '../../tsconfig.demo.json'),
+    }, '../../tsconfig.demo.json', '.', { outDir: undefined }),
     // Note: This can't use the demo tsconfig as it is the core package
     create({
       'js/tinymce/tinymce.js': 'src/core/main/ts/api/Main.ts'

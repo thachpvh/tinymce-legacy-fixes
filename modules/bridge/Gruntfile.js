@@ -1,6 +1,5 @@
 const {
-  CheckerPlugin,
-  TsConfigPathsPlugin
+  CheckerPlugin
 } = require('awesome-typescript-loader');
 const LiveReloadPlugin = require('webpack-livereload-plugin');
 const path = require('path');
@@ -29,11 +28,7 @@ module.exports = function(grunt) {
 
         resolve: {
           extensions: ['.ts', '.js'],
-          plugins: [
-            new TsConfigPathsPlugin({
-              compiler: 'typescript'
-            })
-          ]
+          tsconfig: path.resolve(__dirname, 'tsconfig.json')
         },
 
         module: {
