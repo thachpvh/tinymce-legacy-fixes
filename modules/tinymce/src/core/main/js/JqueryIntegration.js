@@ -305,7 +305,7 @@
           var ed = tinyMCEInstance(node);
 
           if (ed) {
-            ret += textProc ? ed.getContent().replace(/<(?:"[^"]*"|'[^']*'|[^'">])*>/g, "") : ed.getContent({ save: true });
+            ret += ed.getContent(textProc ? { format: "text" } : { save: true });
           } else {
             ret += origFn.apply($(node), args);
           }
