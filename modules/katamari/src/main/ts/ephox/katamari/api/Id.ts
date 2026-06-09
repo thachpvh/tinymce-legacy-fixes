@@ -5,7 +5,7 @@
  * and digits, so that it may safely be used within HTML attributes.
  *
  * The chance of generating a non-unique identifier has been minimized
- * by combining the current time, a random number and a one-up counter.
+ * by combining the current time and a one-up counter.
  *
  * generate :: String -> String
  */
@@ -14,9 +14,8 @@ let unique = 0;
 export const generate = (prefix: string): string => {
   const date = new Date();
   const time = date.getTime();
-  const random = Math.floor(Math.random() * 1000000000);
 
   unique++;
 
-  return prefix + '_' + random + unique + String(time);
+  return prefix + '_' + unique + String(time);
 };
