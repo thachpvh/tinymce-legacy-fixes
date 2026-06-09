@@ -6,6 +6,7 @@ const lockfile = fs.readFileSync(path.join(__dirname, '..', 'yarn.lock'), 'utf8'
 const minimumVersions = {
   'braces': '3.0.3',
   'dot-prop': '4.2.1',
+  'fast-xml-parser': '5.7.0',
   'form-data': '2.5.4',
   'json-schema': '0.4.0',
   'json5': '1.0.2',
@@ -45,6 +46,12 @@ const vulnerableVersionRules = {
     { min: '0.0.0', max: '3.1.3' },
     { min: '5.0.0', max: '5.1.8' },
     { min: '6.0.0', max: '6.2.2' }
+  ],
+  'qs': [
+    { min: '6.11.1', max: '6.15.2' }
+  ],
+  'tar-fs': [
+    { min: '3.0.0', max: '3.1.1' }
   ]
 };
 
