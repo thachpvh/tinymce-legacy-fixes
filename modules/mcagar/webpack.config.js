@@ -1,4 +1,4 @@
-const { CheckerPlugin, TsConfigPathsPlugin } = require('awesome-typescript-loader')
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin')
 const path = require('path');
 
 module.exports = {
@@ -8,15 +8,20 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.js'],
     plugins: [
-      new TsConfigPathsPlugin({
-        baseUrl: '.',
-        compiler: 'typescript'
+      new TsconfigPathsPlugin({
+        configFile: path.resolve(__dirname, 'tsconfig.json')
       }),
     ]
   },
 
   module: {
     rules: [
+      {
+        test: /\.m?js$/,
+        resolve: {
+          fullySpecified: false
+        }
+      },
       {
         test: /\.js$/,
         use: ['source-map-loader'],
@@ -25,14 +30,20 @@ module.exports = {
 
       {
         test: /\.ts$/,
-        use: ['awesome-typescript-loader']
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              transpileOnly: true,
+              configFile: path.resolve(__dirname, 'tsconfig.json')
+            }
+          }
+        ]
       }
     ]
   },
 
-  plugins: [
-    new CheckerPlugin()
-  ],
+  plugins: [],
 
   output: {
     filename: 'demo.js',
