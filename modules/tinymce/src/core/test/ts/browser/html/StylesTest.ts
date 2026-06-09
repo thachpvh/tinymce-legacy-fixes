@@ -14,6 +14,7 @@ describe('browser.tinymce.core.html.StylesTest', () => {
     assert.equal(styles.serialize(styles.parse('key:"value"')), `key: 'value';`);
     assert.equal(styles.serialize(styles.parse(`key:"value1" 'value2'`)), `key: 'value1' 'value2';`);
     assert.equal(styles.serialize(styles.parse(`key:"val\\"ue1" 'val\\'ue2'`)), `key: 'val"ue1' 'val\\'ue2';`);
+    assert.equal(styles.serialize(styles.parse(String.raw`key:"value\\name"`)), String.raw`key: 'value\\\\name';`);
     assert.equal(styles.serialize(styles.parse('width:100%')), 'width: 100%;');
     assert.equal(styles.serialize(styles.parse('value:_; value2:"_"')), `value: _; value2: '_';`);
     assert.equal(styles.serialize(styles.parse('value: "&amp;"')), `value: '&amp;';`);
@@ -63,6 +64,10 @@ describe('browser.tinymce.core.html.StylesTest', () => {
     assert.equal(
       styles.serialize(styles.parse(`background: url('http://www.site.com/a_190x144.jpg');`)),
       `background: url('|http://www.site.com/a_190x144.jpg|');`
+    );
+    assert.equal(
+      styles.serialize(styles.parse(String.raw`background: url("folder\\file's.png")`)),
+      String.raw`background: url('|folder\\\\file\'s.png|');`
     );
   });
 
