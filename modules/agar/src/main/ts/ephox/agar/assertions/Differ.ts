@@ -16,6 +16,16 @@ const htmlDiff: (v1: string, v2: string) => string = (() => {
   // eslint-disable-next-line @typescript-eslint/unbound-method
   const hasOwn = Object.prototype.hasOwnProperty;
 
+  const trimTrailingWhitespace = (value: string): string => {
+    let end = value.length;
+
+    while (end > 0 && value.charAt(end - 1).trim().length === 0) {
+      end--;
+    }
+
+    return value.substring(0, end);
+  };
+
   /* jshint eqeqeq:false, eqnull:true */
   const diff = (o, n) => {
     let i;
@@ -94,8 +104,8 @@ const htmlDiff: (v1: string, v2: string) => string = (() => {
   };
 
   return (o, n) => {
-    o = o.replace(/\s+$/, '');
-    n = n.replace(/\s+$/, '');
+    o = trimTrailingWhitespace(o);
+    n = trimTrailingWhitespace(n);
 
     let i, pre,
       str = '',
