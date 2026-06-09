@@ -573,6 +573,14 @@ describe('browser.tinymce.core.dom.SerializerTest', () => {
     assert.equal(ser.serialize(DOM.get('test')), '<script>// <![CDATA[\nvar hi = \"hello\";\n// ]]></s' + 'cript>');
   });
 
+  it('Script with line comment and alternative html comment end with element_format: xhtml', () => {
+    const ser = DomSerializer({ fix_list_elements: true, element_format: 'xhtml' });
+    ser.setRules('script[type|language|src]');
+
+    DOM.setHTML('test', '<script>// <!--\nvar hi = "hello";\n// --!></s' + 'cript>');
+    assert.equal(ser.serialize(DOM.get('test')), '<script>// <![CDATA[\nvar hi = \"hello\";\n// ]]></s' + 'cript>');
+  });
+
   it('Script with line comment and html comment', () => {
     const ser = DomSerializer({ fix_list_elements: true });
     ser.setRules('script[type|language|src]');

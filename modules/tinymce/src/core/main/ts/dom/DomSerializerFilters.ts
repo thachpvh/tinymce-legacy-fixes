@@ -108,7 +108,7 @@ const register = (htmlParser: DomParser, settings: DomSerializerSettings, dom: D
       return value.replace(/(<!--\[CDATA\[|\]\]-->)/g, '\n')
         .replace(/^[\r\n]*|[\r\n]*$/g, '')
         .replace(/^\s*((<!--)?(\s*\/\/)?\s*<!\[CDATA\[|(<!--\s*)?\/\*\s*<!\[CDATA\[\s*\*\/|(\/\/)?\s*<!--|\/\*\s*<!--\s*\*\/)\s*[\r\n]*/gi, '')
-        .replace(/\s*(\/\*\s*\]\]>\s*\*\/(-->)?|\s*\/\/\s*\]\]>(-->)?|\/\/\s*(-->)?|\]\]>|\/\*\s*-->\s*\*\/|\s*-->\s*)\s*$/g, '');
+        .replace(/\s*(\/\*\s*\]\]>\s*\*\/(--!?>)?|\s*\/\/\s*\]\]>(--!?>)?|\/\/\s*(--!?>)?|\]\]>|\/\*\s*--!?>\s*\*\/|\s*--!?>\s*)\s*$/g, '');
     };
 
     let i = nodes.length;
