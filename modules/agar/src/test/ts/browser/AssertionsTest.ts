@@ -41,4 +41,11 @@ UnitTest.test('AssertionsTest', () => {
   } catch (err) {
     assert.fail('Unexpected error: ' + err.message);
   }
+
+  try {
+    Assertions.assertHtml('trailing tabs should be ignored in html diff', 'alpha\t\t', 'alpha beta\t\t');
+    assert.fail('Expected assertHtml to fail');
+  } catch (err) {
+    assert.eq('Expected trailing tabs to be excluded from diff comparison', ' alpha <ins>beta </ins>', err.diff.comparison);
+  }
 });
