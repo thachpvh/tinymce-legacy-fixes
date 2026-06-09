@@ -13,6 +13,11 @@ describe('atomic.katamari.api.data.IdTest', () => () => {
     assert.notEqual(one, two);
   });
 
+  it('should generate attribute-safe IDs', () => {
+    const id = Id.generate('test');
+    assert.match(id, /^test_[0-9]+$/);
+  });
+
   it('should not generate identical IDs', () => {
     const arbId = fc.string(1, 30).map(Id.generate);
     fc.assert(fc.property(arbId, arbId, (id1, id2) => id1 !== id2));
