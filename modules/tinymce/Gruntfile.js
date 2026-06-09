@@ -30,12 +30,14 @@ const stripSourceMaps = function (data) {
   return sourcemap > -1 ? data.slice(0, sourcemap) : data;
 };
 
+const escapeRegExp = (value) => value.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
+
 module.exports = function (grunt) {
   const packageData = grunt.file.readJSON('package.json');
   const BUILD_VERSION = packageData.version + (process.env.BUILD_NUMBER ? '-' + process.env.BUILD_NUMBER : '');
 
   // Determine the release date
-  const dateRe = new RegExp('^##\\s+' + packageData.version.toString().replace(/\./g, '\\.') + '\\s+\\-\\s+([\\d-]+)$', 'm');
+  const dateRe = new RegExp('^##\\s+' + escapeRegExp(packageData.version.toString()) + '\\s+\\-\\s+([\\d-]+)$', 'm');
   const changelog = grunt.file.read('CHANGELOG.md').toString();
   const dateMatch = dateRe.exec(changelog);
   if (dateMatch !== null) {

@@ -54,6 +54,8 @@ const toHex = (match: string, r: string, g: string, b: string) => {
   return '#' + hex(r) + hex(g) + hex(b);
 };
 
+const escapeCssString = (value: string): string => value.replace(/\\/g, '\\\\').replace(/\'/g, `\\'`);
+
 const Styles = function (settings?: StylesSettings, schema?: Schema): Styles {
   /* jshint maxlen:255 */
   /* eslint max-len:0 */
@@ -234,7 +236,7 @@ const Styles = function (settings?: StylesSettings, schema?: Schema): Styles {
           str = decode(str);
 
           // Force strings into single quote format
-          return `'` + str.replace(/\'/g, `\\'`) + `'`;
+          return `'` + escapeCssString(str) + `'`;
         }
 
         url = decode(url || url2 || url3);
@@ -257,7 +259,7 @@ const Styles = function (settings?: StylesSettings, schema?: Schema): Styles {
         }
 
         // Output new URL format
-        return `url('` + url.replace(/\'/g, `\\'`) + `')`;
+        return `url('` + escapeCssString(url) + `')`;
       };
 
       if (css) {
