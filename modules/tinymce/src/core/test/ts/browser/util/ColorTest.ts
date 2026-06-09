@@ -23,6 +23,11 @@ describe('browser.tinymce.core.util.ColorTest', () => {
     assert.equal(color.parse({ r: -1, g: -10, b: -20 }).toHex(), '#000000');
   });
 
+  it('parse method should ignore non-hex punctuation in hex colors', () => {
+    assert.equal(Color('#@@@').toHex(), '#000000');
+    assert.equal(Color('#::::::').toHex(), '#000000');
+  });
+
   it('toRgb method', () => {
     assert.deepEqual(Color('#faebcd').toRgb(), { r: 250, g: 235, b: 205 });
   });
