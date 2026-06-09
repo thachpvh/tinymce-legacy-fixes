@@ -1,7 +1,4 @@
-const {
-  CheckerPlugin,
-  TsConfigPathsPlugin
-} = require('awesome-typescript-loader');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const LiveReloadPlugin = require('webpack-livereload-plugin');
 const path = require('path');
 
@@ -30,8 +27,8 @@ module.exports = function(grunt) {
         resolve: {
           extensions: ['.ts', '.js'],
           plugins: [
-            new TsConfigPathsPlugin({
-              compiler: 'typescript'
+            new TsconfigPathsPlugin({
+              configFile: path.resolve(__dirname, 'tsconfig.json')
             })
           ]
         },
@@ -39,17 +36,27 @@ module.exports = function(grunt) {
         module: {
           rules: [
             {
+              test: /\.m?js$/,
+              resolve: {
+                fullySpecified: false
+              }
+            },
+            {
               test: /\.ts$/,
               use: [
                 {
-                  loader: 'awesome-typescript-loader'
+                  loader: 'ts-loader',
+                  options: {
+                    transpileOnly: true,
+                    configFile: path.resolve(__dirname, 'tsconfig.json')
+                  }
                 }
               ]
             }
           ]
         },
 
-        plugins: [new LiveReloadPlugin(), new CheckerPlugin()],
+        plugins: [new LiveReloadPlugin()],
 
         output: {
           filename: path.basename(jsDemoDestFile),

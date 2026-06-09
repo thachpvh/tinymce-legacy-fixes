@@ -1,5 +1,5 @@
 const LiveReloadPlugin = require('webpack-livereload-plugin');
-let { TsConfigPathsPlugin } = require('awesome-typescript-loader');
+let TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const path = require('path');
 const swag = require('@ephox/swag');
 
@@ -21,16 +21,20 @@ let create = (inFile, outFile) => {
       symlinks: false,
       extensions: ['.ts', '.js'],
       plugins: [
-        // We need to use the awesome typescript loader config paths since the one for ts-loader doesn't resolve aliases correctly
-        new TsConfigPathsPlugin({
+        new TsconfigPathsPlugin({
           baseUrl: '.',
-          compiler: 'typescript',
-          configFileName: tsConfig
+          configFile: tsConfig
         })
       ]
     },
     module: {
       rules: [
+        {
+          test: /\.m?js$/,
+          resolve: {
+            fullySpecified: false
+          }
+        },
         {
           test: /\.js|\.ts$/,
           use: ['@ephox/swag/webpack/remapper']

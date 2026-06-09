@@ -7,6 +7,22 @@
     "number-leading-zero": "never",
     "order/properties-alphabetical-order": true,
     "at-rule-empty-line-before": ["always", { ignoreAtRules: "import"}],
-    "function-calc-no-invalid": null
+    "alpha-value-notation": null,
+    "color-function-notation": null,
+    "declaration-block-no-redundant-longhand-properties": null,
+    "font-family-name-quotes": null,
+    "function-no-unknown": null,
+    "function-url-quotes": null,
+    "hue-degree-notation": null,
+    "max-line-length": null,
+    "no-invalid-position-at-import-rule": null,
+    "number-max-precision": null,
+    "property-no-vendor-prefix": null,
+    "selector-attribute-quotes": null,
+    "selector-class-pattern": null,
+    "shorthand-property-no-redundant-values": null,
+    "string-quotes": null,
+    "value-keyword-case": null,
+    "value-no-vendor-prefix": null
   }
 }

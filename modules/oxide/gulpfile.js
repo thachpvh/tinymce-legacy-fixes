@@ -2,20 +2,32 @@ const gulp = require('gulp');
 const connect = require('gulp-connect');
 const clean = require('gulp-clean');
 const less = require('gulp-less');
-const lessAutoprefix = require('less-plugin-autoprefix');
+const autoprefixer = require('autoprefixer');
 const gulpStylelint = require('gulp-stylelint');
 const header = require('gulp-header');
 const cleanCSS = require('gulp-clean-css');
+const postcss = require('postcss');
+const postcssLess = require('postcss-less');
 const sourcemaps = require('gulp-sourcemaps');
 const rename = require('gulp-rename');
 const chalk = require('chalk');
 const fs = require('fs');
 const path = require('path');
 
-const autoprefix = new lessAutoprefix({
-  browsers: ['IE 11', 'last 2 Safari versions', 'iOS 9.0', 'last 2 Chrome versions', 'Firefox ESR'],
-  grid: 'no-autoplace'
-});
+const autoprefix = {
+  install: (_less, pluginManager) => {
+    pluginManager.addPostProcessor({
+      process: (css, extra) => postcss([
+        autoprefixer({
+          overrideBrowserslist: ['IE 11', 'last 2 Safari versions', 'iOS 9.0', 'last 2 Chrome versions', 'Firefox ESR'],
+          grid: 'no-autoplace'
+        })
+      ]).process(css, {
+        from: extra && extra.fileInfo ? extra.fileInfo.filename : undefined
+      }).css
+    });
+  }
+};
 
 //
 // Lint less files using stylelint
@@ -23,6 +35,7 @@ const autoprefix = new lessAutoprefix({
 gulp.task('lint', function() {
   return gulp.src('./src/less/**/*.less')
     .pipe(gulpStylelint({
+      customSyntax: postcssLess,
       failAfterError: true,
       reporters: [
         {formatter: 'string', console: true}

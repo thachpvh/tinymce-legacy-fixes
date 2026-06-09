@@ -1,4 +1,4 @@
-let { TsConfigPathsPlugin } = require('awesome-typescript-loader');
+let TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 let LiveReloadPlugin = require('webpack-livereload-plugin');
 let path = require('path');
 let fs = require('fs');
@@ -19,16 +19,20 @@ let create = (entries, tsConfig, outDir, filename) => {
       symlinks: false,
       extensions: ['.ts', '.js'],
       plugins: [
-        // We need to use the awesome typescript loader config paths since the one for ts-loader doesn't resolve aliases correctly
-        new TsConfigPathsPlugin({
+        new TsconfigPathsPlugin({
           baseUrl: '.',
-          compiler: 'typescript',
-          configFileName: tsConfig
+          configFile: tsConfig
         })
       ]
     },
     module: {
       rules: [
+        {
+          test: /\.m?js$/,
+          resolve: {
+            fullySpecified: false
+          }
+        },
         {
           test: /\.ts$/,
           use: [
