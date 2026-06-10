@@ -5,6 +5,8 @@
  * For commercial licenses see https://www.tiny.cloud/
  */
 
-import * as createDompurify from 'dompurify';
+import * as DOMPurify from 'dompurify';
 
-export const sanitizeHtmlString = (html: string): string => createDompurify().sanitize(html);
+const purifier = (DOMPurify as unknown as { default: typeof DOMPurify }).default;
+
+export const sanitizeHtmlString = (html: string): string => purifier.sanitize(html);
