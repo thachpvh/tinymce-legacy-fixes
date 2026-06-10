@@ -3,6 +3,7 @@
 let zipUtils = require('./tools/modules/zip-helper');
 let gruntUtils = require('./tools/modules/grunt-utils');
 let gruntWebPack = require('./tools/modules/grunt-webpack');
+let buildInfo = require('./tools/modules/build-info');
 let swag = require('@ephox/swag');
 
 let plugins = [
@@ -30,21 +31,10 @@ const stripSourceMaps = function (data) {
   return sourcemap > -1 ? data.slice(0, sourcemap) : data;
 };
 
-const escapeRegExp = (value) => value.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
-
 module.exports = function (grunt) {
   const packageData = grunt.file.readJSON('package.json');
-  const BUILD_VERSION = packageData.version + (process.env.BUILD_NUMBER ? '-' + process.env.BUILD_NUMBER : '');
-
-  // Determine the release date
-  const dateRe = new RegExp('^##\\s+' + escapeRegExp(packageData.version.toString()) + '\\s+\\-\\s+([\\d-]+)$', 'm');
-  const changelog = grunt.file.read('CHANGELOG.md').toString();
-  const dateMatch = dateRe.exec(changelog);
-  if (dateMatch !== null) {
-    packageData.date = dateMatch[1];
-  } else {
-    packageData.date = 'TBD';
-  }
+  const BUILD_VERSION = buildInfo.getBuildVersion(packageData);
+  packageData.date = buildInfo.getBuildDate();
 
   grunt.initConfig({
     pkg: packageData,
@@ -266,7 +256,7 @@ module.exports = function (grunt) {
         options: {
           process: function(content) {
             return content.
-              replace(/@@version@@/g, packageData.version).
+              replace(/@@version@@/g, BUILD_VERSION).
               replace(/@@releaseDate@@/g, packageData.date);
           }
         },
@@ -303,8 +293,8 @@ module.exports = function (grunt) {
         options: {
           process: function (content) {
             return content.
-              replace('@@majorVersion@@', packageData.version.split('.')[0]).
-              replace('@@minorVersion@@', packageData.version.split('.').slice(1).join('.')).
+              replace('@@majorVersion@@', BUILD_VERSION.split('.')[0]).
+              replace('@@minorVersion@@', BUILD_VERSION.split('.').slice(1).join('.')).
               replace('@@releaseDate@@', packageData.date);
           }
         },
@@ -478,7 +468,7 @@ module.exports = function (grunt) {
           },
           onBeforeConcat: function (destPath, chunks) {
             // Strip the license from each file and prepend the license, so it only appears once
-            var license = grunt.file.read('src/core/text/license-header.js').replace(/@@version@@/g, packageData.version).replace(/@@releaseDate@@/g, packageData.date);
+            var license = grunt.file.read('src/core/text/license-header.js').replace(/@@version@@/g, BUILD_VERSION).replace(/@@releaseDate@@/g, packageData.date);
             return [license].concat(chunks.map(function (chunk) {
               return chunk.replace(license, '').trim();
             }));
