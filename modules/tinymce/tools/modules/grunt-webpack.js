@@ -2,8 +2,11 @@ let TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 let LiveReloadPlugin = require('webpack-livereload-plugin');
 let path = require('path');
 let fs = require('fs');
+let buildInfo = require('./build-info');
 
 const packageData = require("../../package.json");
+const buildVersion = buildInfo.getBuildVersion(packageData);
+const buildDate = buildInfo.getBuildDate();
 
 let create = (entries, tsConfig, outDir, filename) => {
   return {
@@ -43,15 +46,15 @@ let create = (entries, tsConfig, outDir, filename) => {
                 multiple: [
                   {
                     search: '@@majorVersion@@',
-                    replace: packageData.version.split('.')[0],
+                    replace: buildVersion.split('.')[0],
                   },
                   {
                     search: '@@minorVersion@@',
-                    replace: packageData.version.split('.').slice(1).join('.'),
+                    replace: buildVersion.split('.').slice(1).join('.'),
                   },
                   {
                     search: '@@releaseDate@@',
-                    replace: packageData.date,
+                    replace: buildDate,
                   }
                 ]
               }
