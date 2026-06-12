@@ -33,6 +33,7 @@ import * as DeleteCommands from '../delete/DeleteCommands';
 import * as NodeType from '../dom/NodeType';
 import * as TouchEvents from '../events/TouchEvents';
 import * as ForceBlocks from '../ForceBlocks';
+import * as ProtectedFilter from '../html/ProtectedFilter';
 import * as KeyboardOverrides from '../keyboard/KeyboardOverrides';
 import { NodeChange } from '../NodeChange';
 import * as Rtc from '../Rtc';
@@ -42,8 +43,6 @@ import * as SelectionBookmark from '../selection/SelectionBookmark';
 import { hasAnyRanges } from '../selection/SelectionUtils';
 import SelectionOverrides from '../SelectionOverrides';
 import Quirks from '../util/Quirks';
-
-declare const escape: any;
 
 const DOM = DOMUtils.DOM;
 
@@ -147,6 +146,12 @@ const mkSerializerSettings = (editor: Editor): DomSerializerSettings => {
 
 const createParser = (editor: Editor): DomParser => {
   const parser = DomParser(mkParserSettings(editor), editor.schema);
+
+  parser.addAttributeFilter('data-mce-src,data-mce-href,data-mce-style', (nodes, name) => {
+    for (let i = 0; i < nodes.length; i++) {
+      nodes[i].attr(name, null);
+    }
+  });
 
   // Convert src and href into data-mce-src, data-mce-href and data-mce-style
   parser.addAttributeFilter('src,href,style,tabindex', (nodes, name) => {
@@ -356,13 +361,7 @@ const preInit = (editor: Editor) => {
   }
 
   if (settings.protect) {
-    editor.on('BeforeSetContent', (e) => {
-      Tools.each(settings.protect, (pattern) => {
-        e.content = e.content.replace(pattern, (str) => {
-          return '<!--mce:protected ' + escape(str) + '-->';
-        });
-      });
-    });
+    ProtectedFilter.registerProtectedHtmlFilters(editor, settings.protect);
   }
 
   editor.on('SetContent', () => {

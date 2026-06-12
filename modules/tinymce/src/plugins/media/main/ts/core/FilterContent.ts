@@ -8,11 +8,33 @@
 import Editor from 'tinymce/core/api/Editor';
 import AstNode from 'tinymce/core/api/html/Node';
 import Tools from 'tinymce/core/api/util/Tools';
+import URI from 'tinymce/core/api/util/URI';
 
+import * as Settings from '../api/Settings';
 import * as Nodes from './Nodes';
 import * as Sanitize from './Sanitize';
+import * as VideoScript from './VideoScript';
 
 declare let unescape: any;
+
+// URL bearing attributes that must be validated as DOM safe, matching the core SaxParser.
+const filteredUrlAttrs = Tools.makeMap('src,href,data,background,action,formaction,poster,xlink:href');
+
+// Placeholder attributes (data-mce-p-*) are attacker controlled, so unprefixed values are
+// sanitized the same way the core parser sanitizes regular content: event handler attributes
+// are dropped and url bearing attributes must be DOM safe (e.g. no `javascript:` URIs). See
+// TINY-14357.
+const isSafePlaceholderAttribute = (editor: Editor, elementName: string, name: string, value: string): boolean => {
+  if (name.indexOf('on') === 0) {
+    return false;
+  }
+
+  if (filteredUrlAttrs[name] && !URI.isDomSafe(value, elementName, editor.settings)) {
+    return false;
+  }
+
+  return true;
+};
 
 const setup = (editor: Editor): void => {
   editor.on('preInit', () => {
@@ -56,6 +78,26 @@ const setup = (editor: Editor): void => {
         }
 
         realElmName = node.attr(name);
+
+        // Reject anything that is not a plain element name so it can never be turned into markup
+        if (typeof realElmName !== 'string' || !/^[a-z][a-z0-9-]*$/i.test(realElmName)) {
+          node.remove();
+          continue;
+        }
+
+        // Only restore `script` placeholders whose source matches a configured `media_scripts`
+        // entry, mirroring the trust check applied when the placeholder is first created (see
+        // Nodes.ts). The editor schema treats `script` as a valid element by default, so without
+        // this check an injected `data-mce-object="script"` payload would become an executable
+        // script on serialization.
+        if (realElmName === 'script') {
+          const scriptSrc = node.attr('data-mce-p-src');
+          if (typeof scriptSrc !== 'string' || !VideoScript.getVideoScriptMatch(Settings.getScripts(editor), scriptSrc)) {
+            node.remove();
+            continue;
+          }
+        }
+
         realElm = new AstNode(realElmName, 1);
 
         // Add width/height to everything but audio
@@ -78,14 +120,19 @@ const setup = (editor: Editor): void => {
           style: node.attr('style')
         });
 
-        // Unprefix all placeholder attributes
+        // Unprefix all placeholder attributes, dropping any that are not safe to restore
         attribs = node.attributes;
         ai = attribs.length;
         while (ai--) {
           const attrName = attribs[ai].name;
 
           if (attrName.indexOf('data-mce-p-') === 0) {
-            realElm.attr(attrName.substr(11), attribs[ai].value);
+            const unprefixedName = attrName.substr(11);
+            const attrValue = attribs[ai].value;
+
+            if (isSafePlaceholderAttribute(editor, realElmName, unprefixedName, attrValue)) {
+              realElm.attr(unprefixedName, attrValue);
+            }
           }
         }
 
